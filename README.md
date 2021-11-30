@@ -12,8 +12,8 @@ Additionally, information on the embedded testbench (short *ETB*) that was used 
 
 ```
 .
-├── dca                 : DCA-based fault detection
-└── energy_efficiency   : General energy efficiency
+├── <pre><a href="#dca">dca</a></pre>                 : DCA-based fault detection
+└── <pre><a href="#energy-efficiency">energy_efficiency</a></pre>   : General energy efficiency
 ```
 
 ### DCA ###
