@@ -5,19 +5,19 @@ This approach detects node level faults by combining node-level diagnostic infor
 
 Correspondingly, we provide pre-recorded sensor data (from current and previous deployments), node fault signatures (from previous and current experiments), and Python scripts to:
 
-* visualize a given dataset (see `visualize_dataset.py`):  
+* **Visualize a given dataset** (see `visualize_dataset.py`):  
   Example call: `python3 visualize_dataset.py datasets/asnx_base_data.csv 1`  
   Default output filename: input filename ending with `-plot.svg`  
   Default output directory: `plots/`
-* simulate the modified dDCA on a given dataset (see `simulate_ddca.py`)  
+* **Simulate the modified dDCA on a given dataset** (see `simulate_ddca.py`)  
   Example call: `python3 simulate_ddca.py datasets/asnx_base_data.csv`  
   Default output filename: input filename ending with `-ddca.csv`  
   Default output directory: `results/`
-* visualize a given dDCA-extended dataset (see `visualize_ddca_dataset.py`)  
+* **Visualize a given dDCA-extended dataset** (see `visualize_ddca_dataset.py`)  
   Example call: `python3 visualize_ddca_dataset.py results/base_-_indoor_-_stable-ddca.csv 1`  
   Default output filename: input filename ending with `-plot.svg`  
   Default output directory: `plots/`
-* analyze and compare the output of the dDCA simulation (see `assess_ddca_output.py`)  
+* **Analyze and compare the output of the dDCA simulation** (see `assess_ddca_output.py`)  
   Example call: `python3 assess_ddca_output.py results/base_-_indoor_-_stable-ddca.csv`  
   Default output filename: input filename ending with `-result.csv`  
   Default output directory: `results/`
