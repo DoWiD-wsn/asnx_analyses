@@ -45,19 +45,19 @@ In addition, we added example plots of the base datasets and fault signature for
 └── base_-_outdoor_-_heavy_rain.csv : Outdoor deployment with heavy rain in second half
 ```
 
-### base_-_indoor_-_stable ###
+### base - indoor - stable ###
 
 Dataset recorded from indoor deployment (sensor node `41B9FD22` located in living space) between 2021-07-04 06:00:00 and 2021-07-11 06:00:00 with no noticeable occurrences.
 The update interval was 10 minutes.
 
 
-### base_-_indoor_-_room_airing ###
+### base - indoor - room airing ###
 
 Dataset recorded from indoor deployment (sensor node `41CC57CC` located in office) between 2021-11-22 00:00:00 and 2021-11-29 00:00:00 with several small events when the nearby windows were opened to air the room.
 The update interval was 1 minute.
 
 
-### base_-_outdoor_-_heavy_rain ###
+### base - outdoor - heavy rain ###
 
 Dataset recorded from outdoor deployment (sensor node `41CC57CC` located in Lower Austria) between 2021-08-12 04:00:00 and 2021-08-19 04:00:00 with heavy rain starting from 2021-08-16 morning.
 The update interval was 10 minutes.
