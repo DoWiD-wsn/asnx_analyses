@@ -25,6 +25,11 @@ fi
 # Get the desired number of runs
 RUNS=$1
 
+# Delete previous result directories
+rm -rf ./results/
+rm -rf ./plots/
+rm -rf ./sim_results/
+
 # Iterate over all available datasets
 for dataset in base_datasets/* ; do
     # Run desired number of simulations per dataset
@@ -47,6 +52,7 @@ echo "Generate plot for every result file"
 for resultfile in results/* ; do
     python3 visualize_ddca_dataset.py $resultfile
 done
+echo ""
 
 # Run assessment script
 echo "Run assessment script for all results"
