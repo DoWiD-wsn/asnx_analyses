@@ -55,7 +55,7 @@ SAFE_SENS       = 0.1
 
 ##### SIMULATION #######################
 ### Check input file
-# Paremeter given
+# Parameter given
 if (len(sys.argv) != 2):
     print("ERROR: the script needs at least the input CSV file as parameter!")
     exit(-1)
