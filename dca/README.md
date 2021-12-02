@@ -72,6 +72,7 @@ The update interval was 10 minutes.
 ```
 ./fault_signatures/
 ├── fault_-_bad_connection.csv      : Node fault caused by bad sensor connection
+├── fault_-_humidity_sensor.csv     : Sensor fault caused by humidity in sensor housing
 ├── fault_-_short_circuit_air.csv   : Short circuit caused by humidity affecting air-related measurements
 └── fault_-_short_circuit_soil.csv  : Short circuit caused by humidity affecting soil-related measurements
 ```
