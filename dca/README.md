@@ -13,18 +13,33 @@ Correspondingly, we provide pre-recorded sensor data (from current and previous 
   Example call: `python3 visualize_fault.py fault_signatures/fault-bad_connection.csv 1`  
   Default output filename: input filename ending with `-plot.svg`  
   Default output directory: `plots/`
-* **Simulate the modified dDCA on a given dataset** (see `simulate_ddca.py`)  
-  Example call: `python3 simulate_ddca.py datasets/asnx_base_data.csv`  
-  Default output filename: input filename ending with `-ddca.csv`  
-  Default output directory: `results/`
 * **Visualize a given dDCA-extended dataset** (see `visualize_ddca_dataset.py`)  
   Example call: `python3 visualize_ddca_dataset.py results/base_-_indoor_-_stable-ddca.csv 1`  
   Default output filename: input filename ending with `-plot.svg`  
   Default output directory: `plots/`
+* **Simulate the modified dDCA on a given dataset** (see `simulate_ddca.py`)  
+  Example call: `python3 simulate_ddca.py datasets/asnx_base_data.csv`  
+  Default output filename: input filename ending with `-ddca.csv`  
+  Default output directory: `results/`
 * **Analyze and compare the output of the dDCA simulation** (see `assess_ddca_output.py`)  
   Example call: `python3 assess_ddca_output.py results/base_-_indoor_-_stable-ddca.csv`  
   Default output filename: input filename ending with `-result.csv`  
   Default output directory: `results/`
+* **Simulate fault injection and the modified dDCA on a given dataset** (see `simulate_ddca_inject_faults.py`)  
+  Example call: `python3 simulate_ddca_inject_faults.py datasets/asnx_base_data.csv`  
+  Default output filename: input filename ending with `-ddca_with_faults.csv`  
+  Default output directory: `results/`
+* **Assess the dDCA's effectiveness in detecting injected faults** (see `simulation-assess_results.py`)  
+  Example call: `python3 simulation-assess_results.py`  
+  Default output filename: `simulation_assessment_result.csv`  
+  Default output directory: `sim_results/`
+
+In addition, the following Bash script is available:
+
+* **Run full simulation with given number of iterations*** (see `rerun_simulation.sh`)
+  Example call: `./rerun_simulation.sh 10`  
+  Calls the following Python scripts: `simulate_ddca_inject_faults.py, visualize_ddca_dataset.py, simulation-assess_results.py`  
+  Final result output: `sim_results/simulation_assessment_result.csv`
 
 Information on the single base datasets and the fault signatures are provided below.
 In addition, we added example plots of the base datasets and fault signature for visual inspection.
