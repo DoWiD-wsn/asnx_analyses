@@ -254,8 +254,8 @@ for i in range(len(FAULTS)):
 ##################################
 ##### INJECT FAULTS ##############
 ##################################
-# Get random number of faults
-F_NUM = randint(0,10)
+# Get random number of faults (at least one)
+F_NUM = randint(1,10)
 # Inject faults
 for i in range(F_NUM):
     # Get fault signature index
