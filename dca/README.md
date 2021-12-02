@@ -34,13 +34,6 @@ Correspondingly, we provide pre-recorded sensor data (from current and previous 
   Default output filename: `simulation_assessment_result.csv`  
   Default output directory: `sim_results/`
 
-In addition, the following Bash script is available:
-
-* **Run full simulation with given number of iterations*** (see `rerun_simulation.sh`)
-  Example call: `./rerun_simulation.sh 10`  
-  Calls the following Python scripts: `simulate_ddca_inject_faults.py, visualize_ddca_dataset.py, simulation-assess_results.py`  
-  Final result output: `sim_results/simulation_assessment_result.csv`
-
 Information on the single base datasets and the fault signatures are provided below.
 In addition, we added example plots of the base datasets and fault signature for visual inspection.
 
