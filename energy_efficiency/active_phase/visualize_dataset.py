@@ -111,6 +111,8 @@ ax1.grid(which='major', color='#CCCCCC', linestyle=':')
 # x-axis
 ax1.set_xlabel('time [ms]')
 ax1.set_xlim(x_first,x_last)
+ax1.xaxis.set_major_locator(MultipleLocator(200))
+ax1.xaxis.set_minor_locator(AutoMinorLocator(2))
 ax1.xaxis.set_ticks_position('bottom')
 # y-axis
 ax1.set_ylabel('power consumption [mW]')
@@ -120,8 +122,6 @@ ax1.spines['right'].set_visible(False)
 ax1.spines['bottom'].set_position(('data',0))
 ax1.yaxis.set_ticks_position('left')
 ax1.spines['left'].set_position(('data',x_first))
-ax1.xaxis.set_major_locator(MultipleLocator(200))
-ax1.xaxis.set_minor_locator(AutoMinorLocator(2))
 ax1.yaxis.set_major_locator(MultipleLocator(10))
 ax1.yaxis.set_minor_locator(AutoMinorLocator(2))
 # plot data

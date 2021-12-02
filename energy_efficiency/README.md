@@ -34,11 +34,21 @@ The dataset (`active_phase-record.csv`) contains the measurements of the Joulesc
 
 The dataset can be visualized using the provided Python3 script (`visualize_dataset.py`) with:  
   `python3 visualize_dataset.py active_phase-record.csv 1`  
-To enhance the visibility of the resulting plot (`active_phase-plot.svg`) the mean average of `N` samples is first calculated to reduce the dataset size (e.g., with `N = 500`).
+To enhance the visibility of the resulting plot the mean average of `N` samples is first calculated to reduce the dataset size (e.g., with `N = 500`).
 The resulting reduced dataset is then plotted.
+An example plot of the provided dataset is available in `active_phase-record-plot.svg`.
 
 
 ### DC/DC Converter ###
 
-Dataset recorded from indoor deployment (sensor node `41CC57CC` located in office) between 2021-11-22 00:00:00 and 2021-11-29 00:00:00 with several small events when the nearby windows were opened to air the room.
-The update interval was 1 minute.
+The efficiency of the used DC/DC converter (i.e., TPS63031DSKR) was measured using the `supply_voltage_sweep.py` example script of our [embedded testbench (ETB](https://github.com/DoWiD-wsn/embedded_testbench).
+During this analysis, the ASN(x) was put to active mode where it stayed idling in an endless loop.
+The resulting measurements of the current consumption at a decreasing supply voltage (from 3.5 down to 1.5 V) are available in `dcdc_idle-record.csv`.
+Reference measurements of the power consumption of a directly supplied ASN(x), by bypassing the DC/DC converter, are available in `dcdc_idle_ref.csv`.
+Both datasets contains the measurements in the format:  
+`voltage [dec] , voltage [V] , current [mA] , power [mW]`
+where the first voltage is the value written to the ETB's DC/DC converter used to control the ASN(x)' supply voltage.
+
+The datasets can be visualized using the provided Python3 script (`visualize_dataset.py`) with:  
+  `python3 visualize_dataset.py 1`  
+An example plot of the provided dataset is available in `dcdc_idle-record-plot.svg`.
