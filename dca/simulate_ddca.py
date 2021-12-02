@@ -148,7 +148,6 @@ for row in csv_i:
         t_air_t = round(float(row[3]),2)
         t_air.append(t_air_t)
         t_soil_t = round(float(row[4]),2)
-        t_soil_t = 0
         t_soil.append(t_soil_t)
         h_air_t = round(float(row[5]),2)
         h_air.append(h_air_t)
