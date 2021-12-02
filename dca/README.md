@@ -9,6 +9,10 @@ Correspondingly, we provide pre-recorded sensor data (from current and previous 
   Example call: `python3 visualize_dataset.py datasets/asnx_base_data.csv 1`  
   Default output filename: input filename ending with `-plot.svg`  
   Default output directory: `plots/`
+* **Visualize a given fault** (see `visualize_fault.py`):  
+  Example call: `python3 visualize_fault.py fault_signatures/fault-bad_connection.csv 1`  
+  Default output filename: input filename ending with `-plot.svg`  
+  Default output directory: `plots/`
 * **Simulate the modified dDCA on a given dataset** (see `simulate_ddca.py`)  
   Example call: `python3 simulate_ddca.py datasets/asnx_base_data.csv`  
   Default output filename: input filename ending with `-ddca.csv`  
@@ -67,5 +71,6 @@ The update interval was 10 minutes.
 
 ```
 ./fault_signatures/
-└── tba     : Fault signatures well be added soon
+├── fault_-_bad_connection.csv      : Node fault caused by bad sensor connection
+└── tba                             : Fault signatures well be added soon
 ```
