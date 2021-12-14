@@ -21,7 +21,8 @@ In addition, we added example plots of the acquired data for visual inspection.
 ```
 .
 ├── active_phase        : Detailed analysis of the ASN(x)' active phase
-└── dcdc_converter      : Analysis of the DC/DC converter's efficiency
+├── dcdc_converter      : Analysis of the DC/DC converter's efficiency
+└── mcu_frequency       : Analysis of the effect of F_CPU on energy efficiency
 ```
 
 
@@ -42,13 +43,22 @@ An example plot of the provided dataset is available in `active_phase-record-plo
 ### DC/DC Converter ###
 
 The efficiency of the used DC/DC converter (i.e., TPS63031DSKR) was measured using the `supply_voltage_sweep.py` example script of our [embedded testbench (ETB](https://github.com/DoWiD-wsn/embedded_testbench).
-During this analysis, the ASN(x) was put to active mode where it stayed idling in an endless loop.
+During this analysis, the ASN(x) was put to an active mode where it stayed idling in an endless loop.
 The resulting measurements of the current consumption at a decreasing supply voltage (from 3.5 down to 1.5 V) are available in `dcdc_idle-record.csv`.
 Reference measurements of the power consumption of a directly supplied ASN(x), by bypassing the DC/DC converter, are available in `dcdc_idle_ref.csv`.
-Both datasets contains the measurements in the format:  
+Both datasets contain the measurements in the format:  
 `voltage [dec] , voltage [V] , current [mA] , power [mW]`
 where the first voltage is the value written to the ETB's DC/DC converter used to control the ASN(x)' supply voltage.
 
 The datasets can be visualized using the provided Python3 script (`visualize_dataset.py`) with:  
   `python3 visualize_dataset.py 1`  
 An example plot of the provided dataset is available in `dcdc_idle-record-plot.svg`.
+
+
+### MCU Frequency ###
+
+Currently, the ASN(x) is clocked by a 4 MHz external quartz crystal.
+The clock frequency has, aside from the supply voltage, an impact on the dynamic power dissipation and, thus, the total energy consumption of the sensor node.
+To confirm the choice of the oscillator frequency, several experiments were conducted.
+In this context, a [Joulescope](https://www.joulescope.com/) was used for the measurements.
+The results and findings are collected in this directory.
