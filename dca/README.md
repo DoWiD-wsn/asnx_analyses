@@ -32,7 +32,7 @@ Correspondingly, we provide pre-recorded sensor data (from current and previous 
 
 To perform a full simulation, the following steps are required:
 
-1. Inject faults into a base dataset (`inject_faults.py)
+1. Inject faults into a base dataset (`inject_faults.py`)
 2. Simulate the modified dDCA (`simulate_ddca.py`)
 3. Assess the acquired results (`assess_ddca_output.py`)
 
