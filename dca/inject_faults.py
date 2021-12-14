@@ -1,16 +1,8 @@
 #####
-# @brief    Run the modified dDCA on a pre-recorded dataset with injected faults
+# @brief    Injected faults into pre-recorded dataset
 #
-# Python script to simulate the functioning of the modified
-# deterministic dendritic cell algorithm (dDCA) used for detecting
-# node-level faults in wireless sensor networks. The script first
-# injects faults based on the provided fault signatures in the dataset
-# and then runs the algorithm on pre-recorded data, calculates the
-# interim data (i.e., danger and safe indicators), and determines the
-# final classification result, that is, whether the data is considered
-# normal or faulty.
-# The input data extended with the injected faults and the dDCA data is
-# written to a CSV file.
+# Python script to inject faults based on the provided fault signatures
+# into a given dataset and save the resulting dataset.
 # The input file (CSV) format expected is:
 #   SNID, UNIX_timestamp, SNTIME,
 #   Tair, Tsoil, Hair, Hsoil,
@@ -19,12 +11,12 @@
 # Thereby, the first line contains the header and can be ignored.
 #
 # A dataset has to be given as parameter, for example:
-# => $ python3 simulate_ddca_inject_faults.py datasets/asnx_base_data.csv
+# => $ python3 inject_faults.py datasets/asnx_base_data.csv
 #
-# @file     simulate_ddca_inject_faults.py
+# @file     inject_faults.py
 # @author   Dominik Widhalm
 # @version  1.0.0
-# @date     2021/12/02
+# @date     2021/12/14
 #####
 
 
@@ -38,6 +30,7 @@ from datetime import timedelta
 import sys
 # directory/file functionality
 import os
+import glob
 # To get filename without path and extension
 from pathlib import Path
 # CSV functionality
@@ -50,23 +43,13 @@ from random import randint
 # Output directory
 OUT_DIR     = "results/"
 
-# dendritic cell lifetime/population
-DC_M            = 3
-# number of sensor values for std-dev evaluation
-STDDEV_N        = 10
-# sensitivity of safe indicator
-SAFE_SENS       = 0.1
-
+# Fault signatures directory
+FAULT_DIR   = "fault_signatures/"
 # Available fault signatures
-FAULTS          = [
-                    "fault_signatures/fault_-_bad_connection.csv",
-                    "fault_signatures/fault_-_humidity_sensor.csv",
-                    "fault_signatures/fault_-_sensor_communication.csv",
-                    "fault_signatures/fault_-_short_circuit_air.csv",
-                    "fault_signatures/fault_-_short_circuit_soil.csv"
-                  ]
+FAULTS      = glob.glob(FAULT_DIR+"*.csv")
 
-##### SIMULATION #######################
+
+##### INJECT FAULTS ####################
 ### Check input file
 # Parameter given
 if (len(sys.argv) != 2):
@@ -100,7 +83,7 @@ except Exception as e:
     exit(-1)
 
 # Get output CSV filename from input filename
-CSV_OUTPUT = OUT_DIR+Path(CSV_INPUT).stem + "-ddca_with_faults.csv"
+CSV_OUTPUT = OUT_DIR+Path(CSV_INPUT).stem + "-faulty.csv"
 
 
 ##################################
@@ -304,139 +287,6 @@ for i in range(F_NUM):
         # fault label
         label[F_START+j]    = faults[F_IND][12][j]
 
-
-##################################
-##### RUN THE MODIFIED DDCA ######
-##################################
-# use-case data
-t_air_a     = []
-t_soil_a    = []
-h_air_a     = []
-h_soil_a    = []
-# DCA indicators
-antigen     = []
-danger      = []
-safe        = []
-# Fault context
-context     = []
-# List of dendritic cells
-dcs         = []
-for i in range(len(snid)):
-    # Store last N sensor values
-    t_air_a.append(t_air[i])
-    if len(t_air_a)>STDDEV_N:
-        t_air_a.pop(0)
-    t_soil_a.append(t_soil[i])
-    if len(t_soil_a)>STDDEV_N:
-        t_soil_a.pop(0)
-    h_air_a.append(h_air[i])
-    if len(h_air_a)>STDDEV_N:
-        h_air_a.pop(0)
-    h_soil_a.append(h_soil[i])
-    if len(h_soil_a)>STDDEV_N:
-        h_soil_a.pop(0)
-    ### ANTIGEN ###
-    # use SNID as antigen
-    antigen_t = snid[-1]
-    antigen.append(antigen_t)
-    
-    ### DANGER ###
-    # Use X_NT as danger1
-    danger1_t = x_nt[i]
-    # Use X_VS as danger2
-    danger2_t = x_vs[i]
-    # Use X_BAT as danger3
-    danger3_t = x_bat[i]
-    # Use X_ART as danger4
-    danger4_t = x_art[i]
-    # Use X_RST as danger5
-    danger5_t = x_rst[i]
-    # Use X_IC as danger6
-    danger6_t = x_ic[i]
-    # Use X_ADC as danger7
-    danger7_t = x_adc[i]
-    # Use X_USART as danger8
-    danger8_t = x_usart[i]
-    # Calculate final danger indicators
-    danger_t = round(min(1, (danger1_t + danger2_t + danger3_t + danger4_t + danger5_t + danger6_t + danger7_t + danger8_t)),2)
-    danger.append(danger_t)
-    
-    ### SAFE ###
-    # Safe1 - T_air relative difference
-    safe1_mu = 0
-    for val in t_air_a:
-        safe1_mu = safe1_mu + val
-    safe1_mu = safe1_mu / len(t_air_a)
-    safe1_dev = 0
-    for val in t_air_a:
-        safe1_dev = safe1_dev + ((val-safe1_mu)**2)
-    safe1_dev = safe1_dev / len(t_air_a)
-    safe1_dev = math.sqrt(safe1_dev)
-    safe1_t = safe1_dev
-    # Safe2 - T_soil relative difference
-    safe2_mu = 0
-    for val in t_soil_a:
-        safe2_mu = safe2_mu + val
-    safe2_mu = safe2_mu / len(t_soil_a)
-    safe2_dev = 0
-    for val in t_soil_a:
-        safe2_dev = safe2_dev + ((val-safe2_mu)**2)
-    safe2_dev = safe2_dev / len(t_soil_a)
-    safe2_dev = math.sqrt(safe2_dev)
-    safe2_t = safe2_dev
-    # Safe3 - H_air relative difference
-    safe3_mu = 0
-    for val in h_air_a:
-        safe3_mu = safe3_mu + val
-    safe3_mu = safe3_mu / len(h_air_a)
-    safe3_dev = 0
-    for val in h_air_a:
-        safe3_dev = safe3_dev + ((val-safe3_mu)**2)
-    safe3_dev = safe3_dev / len(h_air_a)
-    safe3_dev = math.sqrt(safe3_dev)
-    safe3_t = safe3_dev
-    # Safe4 - H_soil relative difference
-    safe4_mu = 0
-    for val in h_soil_a:
-        safe4_mu = safe4_mu + val
-    safe4_mu = safe4_mu / len(h_soil_a)
-    safe4_dev = 0
-    for val in h_soil_a:
-        safe4_dev = safe4_dev + ((val-safe4_mu)**2)
-    safe4_dev = safe4_dev / len(h_soil_a)
-    safe4_dev = math.sqrt(safe4_dev)
-    safe4_t = safe4_dev
-    # Calculate final safe indicator
-    safe_t  = round(math.exp(-max(safe1_t, safe2_t, safe3_t, safe4_t)*SAFE_SENS),2)
-    safe.append(safe_t)
-
-    ### dendritic cell update
-    context_t = danger_t - safe_t
-    # Update previous DCs
-    for dc in dcs:
-        dc["context"] = dc["context"] + context_t
-    # Create new DC
-    dcs.append({
-        "antigen"   : antigen_t,
-        "context"   : context_t,
-    })
-    # If population is full, delete oldest DC
-    if len(dcs)>DC_M:
-        dcs.pop(0)
-
-    ### context assignment
-    state = 0
-    for dc in dcs:
-        state = state + 1 if dc["context"]>=0 else state
-    state = state/len(dcs)
-    context_t = 1 if state>0.5 else 0
-    context.append(context_t)
-
-
-####################################
-##### STORE RESULTS ################
-####################################
-
 # Close CSV input file
 try:
     # Try to close the CSV file
@@ -445,6 +295,10 @@ except Exception as e:
     print("Couldn't close CSV input file ... aborting!")
     print(e)
 
+
+####################################
+##### STORE RESULTS ################
+####################################
 # Try to open/create CSV output file
 csv_o = None
 try:
@@ -459,7 +313,7 @@ except Exception as e:
 
 # Write initial rows into the CSV file
 try:
-    csv_o.writerow(["snid", "timestamp [UNIX]", "sntime", "T_air [°C]", "T_soil [°C]", "H_air [%RH]", "H_soil [%RH]", "x_nt", "x_vs", "x_bat", "x_art", "x_rst", "x_ic", "x_adc", "x_usart", "fault", "antigen",  "danger",  "safe", "fault label"])
+    csv_o.writerow(["snid", "timestamp [UNIX]", "sntime", "T_air [°C]", "T_soil [°C]", "H_air [%RH]", "H_soil [%RH]", "x_nt", "x_vs", "x_bat", "x_art", "x_rst", "x_ic", "x_adc", "x_usart", "fault"])
 except Exception as e:
     print("Writing initial data to the CSV file failed ... aborting!")
     print(e)
@@ -469,7 +323,7 @@ except Exception as e:
 for i in range(len(snid)):
     try:
         # Write a row to the CSV file
-        csv_o.writerow([snid[i], tstmp[i], sntime[i], t_air[i], t_soil[i], h_air[i], h_soil[i], x_nt[i], x_vs[i], x_bat[i], x_art[i], x_rst[i], x_ic[i], x_adc[i], x_usart[i], label[i], antigen[i], danger[i], safe[i], context[i]])
+        csv_o.writerow([snid[i], tstmp[i], sntime[i], t_air[i], t_soil[i], h_air[i], h_soil[i], x_nt[i], x_vs[i], x_bat[i], x_art[i], x_rst[i], x_ic[i], x_adc[i], x_usart[i], label[i]])
     except Exception as e:
         print("Writing measurement data to the CSV file failed ... aborting!")
         print(e)
