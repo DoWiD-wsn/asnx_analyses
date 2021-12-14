@@ -17,6 +17,10 @@ Correspondingly, we provide pre-recorded sensor data (from current and previous 
   Example call: `python3 visualize_ddca_dataset.py results/base_-_indoor_-_stable-ddca.csv 1`  
   Default output filename: input filename ending with `-plot.svg`  
   Default output directory: `plots/`
+* **Inject faults into a given dataset** (see `inject_faults.py`)  
+  Example call: `python3 inject_faults.py datasets/asnx_base_data.csv`  
+  Default output filename: input filename ending with `-faulty.csv`  
+  Default output directory: `results/`
 * **Simulate the modified dDCA on a given dataset** (see `simulate_ddca.py`)  
   Example call: `python3 simulate_ddca.py datasets/asnx_base_data.csv`  
   Default output filename: input filename ending with `-ddca.csv`  
@@ -25,14 +29,12 @@ Correspondingly, we provide pre-recorded sensor data (from current and previous 
   Example call: `python3 assess_ddca_output.py results/base_-_indoor_-_stable-ddca.csv`  
   Default output filename: input filename ending with `-result.csv`  
   Default output directory: `results/`
-* **Simulate fault injection and the modified dDCA on a given dataset** (see `simulate_ddca_inject_faults.py`)  
-  Example call: `python3 simulate_ddca_inject_faults.py datasets/asnx_base_data.csv`  
-  Default output filename: input filename ending with `-ddca_with_faults.csv`  
-  Default output directory: `results/`
-* **Assess the dDCA's effectiveness in detecting injected faults** (see `simulation-assess_results.py`)  
-  Example call: `python3 simulation-assess_results.py`  
-  Default output filename: `simulation_assessment_result.csv`  
-  Default output directory: `sim_results/`
+
+To perform a full simulation, the following steps are required:
+
+1. Inject faults into a base dataset (`inject_faults.py)
+2. Simulate the modified dDCA (`simulate_ddca.py`)
+3. Assess the acquired results (`assess_ddca_output.py`)
 
 In addition, the following Bash script is available:
 
