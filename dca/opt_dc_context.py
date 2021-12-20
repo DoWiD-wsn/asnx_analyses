@@ -1,19 +1,20 @@
 #####
-# @brief    Compare the effect of the optimization concerning -- safe indicator aggregation
+# @brief    Compare the effect of the optimization concerning -- context assessment
 #
 # The script takes a dataset as input (i.e., base dataset, fault-induced
 # dataset, or fault signature) and runs the modified dDCA with different
-# calculation options concerning the indicator aggregation. The results
+# calculation options concerning the context assessment. The results
 # are plottet via matplotlib where the focus is on the aspect to compare
-# like, in this case, the indicator aggregation.
+# like, in this case, the context assessment.
 #
 # The following options are compared:
-# *) min aggregation
-# *) max aggregation
-# *) additive aggregation
-# *) multiplicative aggregation
+# 1) single cell, lifetime = 1 (like min-dDCA)
+# 2) N cells -> mean value
+# 3) N cells -> voting
+# 4) N cells -> context aggregation (total k value)
+# 5) N cells -> context aggregation (mean k value)
 # 
-# @file     opt_aggr_safe.py
+# @file     opt_dc_context.py
 # @author   Dominik Widhalm
 # @version  1.0.0
 # @date     2021/12/20
@@ -48,7 +49,7 @@ import matplotlib.dates as md
 OUT_DIR     = "plots/"
 
 # dendritic cell lifetime/population
-DC_M            = 3
+DC_M            = 5
 # number of sensor values for std-dev evaluation
 STDDEV_N        = 10
 # sensitivity of safe indicator
@@ -81,7 +82,7 @@ if not os.path.exists(OUT_DIR):
         exit(-1)
 
 # Base SVG filename on input filename
-SVG_OUTPUT = OUT_DIR+Path(CSV_INPUT).stem + "-opt_aggr_safe-plot.svg"
+SVG_OUTPUT = OUT_DIR+Path(CSV_INPUT).stem + "-opt_dc_context-plot.svg"
 # Use 2nd parameter for transparency
 TRANSPARENT = None
 if len(sys.argv) >= 3:
@@ -170,12 +171,13 @@ h_soil_a    = []
 # DCA indicators
 antigen     = []
 danger      = []
-safe1       = []
-safe2       = []
-safe3       = []
-safe4       = []
+safe        = []
 # Fault context
-context     = []
+context1    = []
+context2    = []
+context3    = []
+context4    = []
+context5    = []
 # List of dendritic cells
 dcs         = []
 
@@ -268,22 +270,12 @@ for i in range(len(snid)):
     safe4_dev = math.sqrt(safe4_dev)
     safe4_t = safe4_dev
     # Calculate final safe indicator
-    # Version 1 - min aggregation
-    safe1_sig  = round(math.exp(-min(safe1_t, safe2_t, safe3_t, safe4_t)*SAFE_SENS),2)
-    safe1.append(safe1_sig)
-    # Version 2 - max aggregation
-    safe2_sig  = round(math.exp(-max(safe1_t, safe2_t, safe3_t, safe4_t)*SAFE_SENS),2)
-    safe2.append(safe2_sig)
-    # Version 3 - additive aggregation
-    safe3_sig  = round(math.exp(-(safe1_t + safe2_t + safe3_t + safe4_t)*SAFE_SENS),2)
-    safe3.append(safe3_sig)
-    # Version 4 - multiplicative aggregation
-    safe4_sig  = round(math.exp(-(((1+safe1_t) * (1+safe2_t) * (1+safe3_t) * (1+safe4_t))-1)*SAFE_SENS),2)
-    safe4.append(safe4_sig)
+    safe_sig  = round(math.exp(-max(safe1_t, safe2_t, safe3_t, safe4_t)*SAFE_SENS),2)
+    safe.append(safe_sig)
 
 
     ### DC UPDATE ###
-    context_t = danger_t - safe1_sig
+    context_t = danger_t - safe_sig
     # Update previous DCs
     for dc in dcs:
         dc["context"] = dc["context"] + context_t
@@ -298,12 +290,36 @@ for i in range(len(snid)):
 
 
     ### CX ASSIGNMENT ###
+    # option 1
+    context1_t = 1 if dcs[-1]["context"]>=0 else 0
+    context1.append(context1_t)
+    # option 2
     state = 0
     for dc in dcs:
         state = state + 1 if dc["context"]>=0 else state
     state = state/len(dcs)
-    context_t = 1 if state>0.5 else 0
-    context.append(context_t)
+    context2_t = state
+    context2.append(context2_t)
+    # option 3
+    state = 0
+    for dc in dcs:
+        state = state + 1 if dc["context"]>=0 else state
+    state = state/len(dcs)
+    context3_t = 1 if state>0.5 else 0
+    context3.append(context3_t)
+    # option 4
+    k_sum = 0
+    for dc in dcs:
+        k_sum = k_sum + dc["context"]
+    context4_t = 1 if k_sum>=0 else 0
+    context4.append(context4_t)
+    # option 5
+    k_sum = 0
+    for dc in dcs:
+        k_sum = k_sum + dc["context"]
+    k_sum = k_sum/len(dcs)
+    context5_t = 1 if k_sum>=0 else 0
+    context5.append(context5_t)
 
 
 ##### PLOT THE DATA VIA MATPLOTLIB ####
@@ -409,15 +425,16 @@ ax3b.yaxis.set_major_locator(MultipleLocator(0.2))
 ax3b.yaxis.set_minor_locator(AutoMinorLocator(2))
 # plot data
 lns1 = ax3.plot(index, danger, '--',  label="danger", color="red")
+lns2 = ax3.plot(index, safe, '-.',  label="safe", color="green")
 ###
-lns2 = ax3.plot(index, safe1, '-.',  label="safe - min", color="palegreen")
-lns3 = ax3.plot(index, safe2, '-.',  label="safe - max", color="lime")
-lns4 = ax3.plot(index, safe3, '-.',  label="safe - sum", color="forestgreen")
-lns5 = ax3.plot(index, safe4, '-.',  label="safe - pro", color="darkgreen")
+lns3 = ax3.plot(index, context1, '-',  label="Cx 1", color="thistle")
+lns4 = ax3.plot(index, context2, '-',  label="Cx 2", color="violet")
+lns5 = ax3.plot(index, context3, '-',  label="Cx 3", color="fuchsia")
+lns6 = ax3b.plot(index, context4, '-',  label="Cx 4", color="darkorchid")
+lns7 = ax3b.plot(index, context5, '-',  label="Cx 5", color="indigo")
 ###
-lns6 = ax3b.plot(index, context, '-',  label="fault context", color="darkorchid")
-lns7 = ax3b.plot(index, label, ':',  label="fault label", color="cornflowerblue")
-lns = lns1+lns2+lns3+lns4+lns5+lns6+lns7
+lns8 = ax3b.plot(index, label, ':',  label="fault label", color="cornflowerblue")
+lns = lns1+lns2+lns3+lns4+lns5+lns6+lns7+lns8
 labs = [l.get_label() for l in lns]
 ax3b.legend(lns, labs, loc='center right', facecolor='white', framealpha=1)
 

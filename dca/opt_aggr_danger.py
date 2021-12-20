@@ -310,10 +310,8 @@ for i in range(len(snid)):
 
 ##### PLOT THE DATA VIA MATPLOTLIB ####
 # get lowest (first) and highest (last) value of interest
-# x_first = index[0]
-# x_last  = index[-1]
-x_first = 140
-x_last  = 200
+x_first = index[0]
+x_last  = index[-1]
 
 # prepare figure
 fig = plt.figure(figsize=(15,8), dpi=300, tight_layout=True)
@@ -420,8 +418,8 @@ lns3 = ax3.plot(index, danger3, '-.',  label="danger - sum", color="red")
 lns4 = ax3.plot(index, danger4, '-.',  label="danger - prod", color="darkred")
 ###
 lns5 = ax3.plot(index, safe, '-.',  label="safe", color="green")
-lns6 = ax3b.plot(index, context, ':',  label="fault context", linewidth=1, color="darkorchid")
-lns7 = ax3b.plot(index, label, '-',  label="fault label", linewidth=1, color="cornflowerblue")
+lns6 = ax3b.plot(index, context, '-',  label="fault context", color="darkorchid")
+lns7 = ax3b.plot(index, label, ':',  label="fault label", color="cornflowerblue")
 lns = lns1+lns2+lns3+lns4+lns5+lns6+lns7
 labs = [l.get_label() for l in lns]
 ax3b.legend(lns, labs, loc='center right', facecolor='white', framealpha=1)
