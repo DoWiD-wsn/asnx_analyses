@@ -1,33 +1,20 @@
-#####
-# @brief    Visualize a given Joulescope record (dataset)
-#
-# Python script to generate a SVG graph of the data of a given
-# Joulescope record via matplotlib. It generates one figure where
-# every N datapoints are reduced to their mean value for better
-# visibility. This is necessary as the Joulescope record was captured
-# with a sampling frequency of 2 MHz and, thus, contains many values.
-# The input file (CSV) format expected is:
-#   time [s], current [A], voltage [V]
-#
-# The Joulescope record has to be given as parameter, for example:
-# => $ python3 visualize_dataset.py active_phase-record.csv 1
-# where the 2nd parameter defines the transparency of the SVG output
-#
-# @file     visualize_dataset.py
-# @author   Dominik Widhalm
-# @version  1.0.0
-# @date     2021/12/02
-#####
+#!/usr/bin/env python3
 
+########################################################################
+#   PLOT JOULESCOPE CSV                                                #
+#                                                                      #
+#   Author: Dominik Widhalm                                            #
+#   Date:   2021-12-29                                                 #
+#                                                                      #
+#   Plot the data acquired with the Joulescope.                        #
+#                                                                      #
+########################################################################
 
 ##### LIBRARIES ########################
-# For date/time
-from datetime import datetime
-from datetime import timedelta
+# basic math
+import math
 # To handle the command line parameter
 import sys
-# directory/file functionality
-import os
 # To get filename without path and extension
 from pathlib import Path
 # CSV and number conversion functionality
@@ -38,14 +25,16 @@ import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 12})
 from matplotlib import rc
 rc('mathtext', default='regular')
-from matplotlib.ticker import (AutoLocator, AutoMinorLocator, MultipleLocator)
-import matplotlib.dates as md
+from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
 
 
-##### GLOBAL VARIABLES #################
-# Average every N samples
+##### GLOBAL VARIABLES #####
+# Number of consecutive values to average
 N = 500
-
+# Start index (set to 'None' if not used)
+start = None
+# End index (set to 'None' if not used)
+end = None
 
 ##### VISUALIZATION ####################
 ### Check input file
@@ -75,60 +64,94 @@ for i in range(len(time)):
     # Convert s to ms
     time[i] *= 1000
 
-# Pre-process data
+# Cut values below zero (measurement errors)
 for i in range(len(current)):
-    # Cut values below zero (measurement errors)
     if current[i]<0:
         current[i]=0.0
     # Convert A to mA
     current[i] *= 1000
 
-# average every N consecutive values
-npt = np.array(time)
-npi = np.array(current)
-npv = np.array(voltage)
-npt_n = np.nanmean(np.pad(npt.astype(float), (0, N-npt.size%N), mode='constant', constant_values=np.NaN).reshape(-1, N), axis=1)
-npi_n = np.nanmean(np.pad(npi.astype(float), (0, N-npi.size%N), mode='constant', constant_values=np.NaN).reshape(-1, N), axis=1)
-npv_n = np.nanmean(np.pad(npv.astype(float), (0, N-npv.size%N), mode='constant', constant_values=np.NaN).reshape(-1, N), axis=1)
+# Calculate resulting power [mW]
+power = []
+for i in range(len(current)):
+    power.append(current[i]*voltage[i])
 
-##### Calculate power from current and voltage #####
-npp_n = []
-for i in range(len(npi_n)):
-    npp_n.append(npi_n[i] * npv_n[i])
+# Get first and last time
+x_first = min(time) if start is None else start
+x_last = max(time) if end is None else end
+
+### Average every N consecutive values
+# time
+npt = np.array(time)
+npt_n = np.nanmean(np.pad(npt.astype(float), (0, N - npt.size%N), mode='constant', constant_values=np.NaN).reshape(-1, N), axis=1)
+# current
+npi = np.array(current)
+npi_n = np.nanmean(np.pad(npi.astype(float), (0, N - npi.size%N), mode='constant', constant_values=np.NaN).reshape(-1, N), axis=1)
+# voltage
+npv = np.array(voltage)
+npv_n = np.nanmean(np.pad(npv.astype(float), (0, N - npv.size%N), mode='constant', constant_values=np.NaN).reshape(-1, N), axis=1)
+# power
+npp = np.array(power)
+npp_n = np.nanmean(np.pad(npp.astype(float), (0, N - npp.size%N), mode='constant', constant_values=np.NaN).reshape(-1, N), axis=1)
 
 
 ##### PLOT DATA ######
-# Get first and last time
-x_first = min(time)
-x_last = max(time)
+# Create subplots
+fig = plt.figure(figsize=(12,9), dpi=150, tight_layout=True)
+ax1 = fig.add_subplot(311)
+ax2 = fig.add_subplot(312)
+ax3 = fig.add_subplot(313)
 
-# prepare figure
-fig = plt.figure(figsize=(12,4), dpi=150, tight_layout=True)
-ax1 = fig.add_subplot(111)
-
-# grid
+### current
 ax1.grid(which='major', color='#CCCCCC', linestyle=':')
-# x-axis
-ax1.set_xlabel('time [ms]')
+ax1.set_ylabel('current [mA]')
 ax1.set_xlim(x_first,x_last)
-ax1.xaxis.set_major_locator(MultipleLocator(200))
-ax1.xaxis.set_minor_locator(AutoMinorLocator(2))
-ax1.xaxis.set_ticks_position('bottom')
-# y-axis
-ax1.set_ylabel('power consumption [mW]')
-ax1.set_ylim(0,105)
+ax1.set_ylim(0,(max(npi_n)*1.1))
 ax1.spines['top'].set_visible(False)
 ax1.spines['right'].set_visible(False)
+ax1.xaxis.set_ticks_position('bottom')
 ax1.spines['bottom'].set_position(('data',0))
 ax1.yaxis.set_ticks_position('left')
 ax1.spines['left'].set_position(('data',x_first))
-ax1.yaxis.set_major_locator(MultipleLocator(10))
-ax1.yaxis.set_minor_locator(AutoMinorLocator(2))
+ax1.set_xticklabels([])
 # plot data
-ax1.plot(npt_n, npp_n, '-',  label=r"$p(t)$", linewidth=1, color="darkviolet")
-
-# Prepare legend
+ax1.plot(npt_n, npi_n, '-',  label=r"$i(t)$", color="darkred")
+# legend
 ax1.legend(loc='upper right', facecolor='white', framealpha=1)
+
+### voltage
+ax2.grid(which='major', color='#CCCCCC', linestyle=':')
+ax2.set_ylabel('voltage [V]')
+ax2.set_xlim(x_first,x_last)
+ax2.set_ylim(0,(max(npv_n)*1.1))
+ax2.spines['top'].set_visible(False)
+ax2.spines['right'].set_visible(False)
+ax2.xaxis.set_ticks_position('bottom')
+ax2.spines['bottom'].set_position(('data',0))
+ax2.yaxis.set_ticks_position('left')
+ax2.spines['left'].set_position(('data',x_first))
+ax2.set_xticklabels([])
+# plot data
+ax2.plot(npt_n, npv_n, '-',  label=r"$v(t)$", color="darkblue")
+# legend
+ax2.legend(loc='upper right', facecolor='white', framealpha=1)
+
+### power
+ax3.grid(which='major', color='#CCCCCC', linestyle=':')
+ax3.set_xlabel('time [ms]')
+ax3.set_ylabel('power [mW]')
+ax3.set_xlim(x_first,x_last)
+ax3.set_ylim(0,(max(npp_n)*1.1))
+ax3.spines['top'].set_visible(False)
+ax3.spines['right'].set_visible(False)
+ax3.xaxis.set_ticks_position('bottom')
+ax3.spines['bottom'].set_position(('data',0))
+ax3.yaxis.set_ticks_position('left')
+ax3.spines['left'].set_position(('data',x_first))
+# plot data
+ax3.plot(npt_n, npp_n, '-',  label=r"$p(t)$", color="darkviolet")
+# legend
+ax3.legend(loc='upper right', facecolor='white', framealpha=1)
 
 ### Finish figure
 if TRANSPARENT:
