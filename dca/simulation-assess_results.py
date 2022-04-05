@@ -55,11 +55,18 @@ import csv
 OUT_DIR     = "sim_results/"
 # Result file location
 RESULT_DIR  = "results/"
-# Assessment result output (CSV file)
-CSV_OUTPUT  = "ddca_assessment_result.csv"
 
 
 ##### ASSESSMENT #######################
+### Check input file
+# Parameter given
+if (len(sys.argv) != 2):
+    print("ERROR: the script needs the method as parameter!")
+    exit(-1)
+METHOD = str(sys.argv[1])
+# Assessment result output (CSV file)
+CSV_OUTPUT  = "%s_assessment_result.csv" % METHOD
+
 # Check if result directory exists
 if not os.path.exists(RESULT_DIR):
     print("ERROR: Result directory does not exist ... aborting!")
@@ -67,9 +74,14 @@ if not os.path.exists(RESULT_DIR):
 
 # Get filenames of all result files
 csv_files = []
-for filename in glob.glob(RESULT_DIR+'*.csv'):
+ending = '*-%s.csv' % METHOD
+for filename in glob.glob(RESULT_DIR+ending):
     csv_files.append(filename)
 num_files = len(csv_files)
+
+if num_files<=0:
+    print("ERROR: no result files found ... aborting!")
+    exit(-1)
 
 # Check if output directory exists
 if not os.path.exists(OUT_DIR):
