@@ -40,8 +40,8 @@ for dataset in base_datasets/* ; do
         # Rename result file
         pathname=$(basename -- "$dataset")
         filename="${pathname%.*}"
-        defname="results/${filename}-ddca_with_faults.csv"
-        newname="results/${filename}-ddca_with_faults-${run}.csv"
+        defname="results/${filename}-ddca.csv"
+        newname="results/${filename}-${run}-ddca.csv"
         mv $defname $newname
     done
 done

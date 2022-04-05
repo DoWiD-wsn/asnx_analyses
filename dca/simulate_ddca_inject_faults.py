@@ -100,7 +100,7 @@ except Exception as e:
     exit(-1)
 
 # Get output CSV filename from input filename
-CSV_OUTPUT = OUT_DIR+Path(CSV_INPUT).stem + "-ddca_with_faults.csv"
+CSV_OUTPUT = OUT_DIR+Path(CSV_INPUT).stem + "-faulty-ddca.csv"
 
 
 ##################################
