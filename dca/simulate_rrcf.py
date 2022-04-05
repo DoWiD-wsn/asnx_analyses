@@ -42,11 +42,10 @@ RESULT_DIR  = "results/"
 
 # Threshold for anomaly score (empirically derived)
 threshold   = 50
-
 # Number of trees
-num_trees   = 40
+num_trees   = 10
 # Tree size
-tree_size   = 256
+tree_size   = 100
 
 
 ##### SIMULATION #######################
@@ -83,7 +82,7 @@ for CSV_INPUT in csv_files:
     print("Reading CSV input file \"%s\"" % CSV_INPUT)
 
     # Get output CSV filename from input filename
-    CSV_OUTPUT = RESULT_DIR+Path(CSV_INPUT).stem + "-rrcf.csv"
+    CSV_OUTPUT = RESULT_DIR+(Path(CSV_INPUT).stem).replace('-ddca','') + "-rrcf.csv"
     print("Write to file \"%s\"" % CSV_OUTPUT)
 
     # Prepare data arrays/lists/etc.
