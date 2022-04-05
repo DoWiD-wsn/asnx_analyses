@@ -56,7 +56,7 @@ OUT_DIR     = "sim_results/"
 # Result file location
 RESULT_DIR  = "results/"
 # Assessment result output (CSV file)
-CSV_OUTPUT  = "simulation_assessment_result.csv"
+CSV_OUTPUT  = "ddca_assessment_result.csv"
 
 
 ##### ASSESSMENT #######################

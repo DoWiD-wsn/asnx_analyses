@@ -55,8 +55,8 @@ done
 echo ""
 
 # Run assessment script
-echo "Run assessment script for all results"
-python3 simulation-assess_results.py
+echo "Run assessment script for all dDCA results"
+python3 simulation-assess_ddca_results.py
 
 echo ""
 echo "DONE!"
