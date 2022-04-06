@@ -47,27 +47,9 @@ warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 RESULT_DIR  = "results/"
 
 # Threshold for calibrated anomaly score
-THRESHOLD   = 0.95      # probability of being normal is less than 5%.
+THRESHOLD   = 0.9      # probability of being normal is less than 10%.
 # Window size for anomaly score calibration
-WINDOW_SIZE = 10
-
-# Models available in PySAD (and applicable to our data)
-models = [
-    # The Exact-STORM method [BAF07]
-    ["storm", ExactStorm()],
-    # An Anomaly Detection Approach Based on Isolation Forest Algorithm for Streaming Data using Sliding Window [BDF13].
-    ["iforest", IForestASD()],
-    # KitNET is a lightweight online anomaly detection algorithm based on an ensemble of autoencoders [BMDES18].
-    ["kitnet", KitNet()],
-    # The LODA model [BPevny16] The implementation is adapted to the streaming framework from the PyOD framework.
-    ["loda", LODA()],
-    # Robust Random Cut Forest model [BGMRS16].
-    ["rrcf", RobustRandomCutForest()],
-    # The xStream model for row-streaming data [BMLA18].
-    ["xstream", xStream()]
-]
-# Init probability calibrator.
-calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE)
+WINDOW_SIZE = 25
 
 ##### SIMULATION #######################
 # Check if result directory exists
@@ -88,11 +70,23 @@ if not os.path.exists(RESULT_DIR):
         print(e)
         exit(-1)
 
-# Iterate over all models of PySAD
-for (name, model) in models:
-    print("=> Model: %s" % name);
-    # Read in all result files
-    for CSV_INPUT in csv_files:
+# Read in all result files
+for CSV_INPUT in csv_files:  
+    print("=> CSV input file \"%s\"" % CSV_INPUT)
+              
+    # Models available in PySAD (and applicable to our data)
+    models = [
+        ["storm", ExactStorm()],
+        ["iforest", IForestASD()],
+        ["loda", LODA()],
+        ["rrcf", RobustRandomCutForest()],
+        ["xstream", xStream()]
+    ]
+    # Init probability calibrator.
+    calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE)
+    
+    # Iterate over all models of PySAD
+    for (name, model) in models:
         # Get data from CSV file
         csv_i = None
         try:
@@ -103,12 +97,11 @@ for (name, model) in models:
         except Exception as e:
             print("Cannot open the CSV input file \"%s\" ... aborting!" % CSV_INPUT)
             exit(-1)
-        print("   Reading CSV input file \"%s\"" % CSV_INPUT)
 
         # Get output CSV filename from input filename
         extension = "-%s.csv" % (name)
         CSV_OUTPUT = RESULT_DIR+(Path(CSV_INPUT).stem).replace('-ddca','') + extension
-        print("   Write to file \"%s\"" % CSV_OUTPUT)
+        print("    Write to file \"%s\"" % CSV_OUTPUT)
 
         # Prepare data arrays/lists/etc.
         snid        = []
@@ -191,7 +184,7 @@ for (name, model) in models:
         ####################################
                 
                 # Concatenate sensor measurements
-                point = [t_air_t, t_soil_t, h_air_t, h_soil_t]
+                point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t])
                 # Fit to an instance x and score it.
                 anomaly_score = model.fit_score_partial(point)
                 # Fit & calibrate score.
@@ -256,6 +249,6 @@ for (name, model) in models:
         except Exception as e:
             print("Couldn't close CSV output file ... aborting!")
             print(e)
-        
-        # Done with this model
-        print()
+    
+    # Done with this dataset
+    print()
