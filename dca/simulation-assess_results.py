@@ -166,9 +166,9 @@ for filename in csv_files:
         print(e)
         exit(-1)
     ### CALCULATE METRICS ###
-    tpr     = round(tp / (tp + fn), 2) if tp>0 else 1
-    tnr     = round(tn / (tn + fp), 2) if tn>0 else 1
-    f_score = round(tp / (tp + (1/2) * (fp + fn)), 2) if tp>0 else 1
+    tpr     = round(tp / (tp + fn), 2) if fn>0 else 1
+    tnr     = round(tn / (tn + fp), 2) if fp>0 else 1
+    f_score = round(tp / (tp + (1/2) * (fp + fn)), 2) if (fp + fn)>0 else 1
     ### Append results to result lists
     lines_tot.append(lines)
     tp_tot.append(tp)
