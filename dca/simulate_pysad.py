@@ -12,9 +12,11 @@
 #
 # @file     simulate_pysad.py
 # @author   Dominik Widhalm
-# @version  1.0.0
-# @date     2022/04/05
+# @version  1.1.0
+# @date     2022/04/16
 # @see      https://pysad.readthedocs.io/en/latest/examples.html
+#
+# @todo     Optimize model parameters for better detection results
 #####
 
 
@@ -71,16 +73,39 @@ if not os.path.exists(RESULT_DIR):
         exit(-1)
 
 # Read in all result files
-for CSV_INPUT in csv_files:  
+for CSV_INPUT in csv_files:
     print("=> CSV input file \"%s\"" % CSV_INPUT)
               
     # Models available in PySAD (and applicable to our data)
     models = [
-        ["storm", ExactStorm()],
-        ["iforest", IForestASD()],
-        ["loda", LODA()],
-        ["rrcf", RobustRandomCutForest()],
-        ["xstream", xStream()]
+        ##### Models running and producing results #####
+        
+        ## Exact-STORM method ##
+        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.ExactStorm.html#pysad.models.ExactStorm
+        # Default: (window_size=10000, max_radius=0.1)
+        ["storm", ExactStorm(window_size=WINDOW_SIZE, max_radius=0.1)],
+        
+        ## Isolation Forest Algorithm for Streaming Data ##
+        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.IForestASD.html#pysad.models.IForestASD
+        # Default: (initial_window_X=None, window_size=2048)
+        ["iforest", IForestASD(initial_window_X=None, window_size=WINDOW_SIZE)],
+        
+        ## RobustRandomCutForest ##
+        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.RobustRandomCutForest.html#pysad.models.RobustRandomCutForest
+        # Default: (num_trees=4, shingle_size=4, tree_size=256)
+        ["rrcf", RobustRandomCutForest(num_trees=5, shingle_size=10, tree_size=100)],
+        
+        ## xStream ##
+        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.xStream.html#pysad.models.xStream
+        # Default: (num_components=100, n_chains=100, depth=25, window_size=25)
+        ["xstream", xStream(num_components=100, n_chains=100, depth=25, window_size=WINDOW_SIZE)],
+        
+        ##### Models running but not producing results #####
+        
+        ## LODA model ##
+        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.LODA.html#pysad.models.LODA
+        # Default: (num_bins=10, num_random_cuts=100)
+        ["loda", LODA(num_bins=5, num_random_cuts=10)],
     ]
     # Init probability calibrator.
     calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE)
