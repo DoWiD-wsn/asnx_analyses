@@ -143,9 +143,9 @@ except Exception as e:
     print(e)
 
 ### CALCULATE METRICS ###
-tpr     = round(tp / (tp + fn), 2) if (tp + fn)>0 else 1
-tnr     = round(tn / (tn + fp), 2) if (tn + fp)>0 else 1
-f_score = round(tp / (tp + (1/2) * (fp + fn)), 2) if (tp + (1/2) * (fp + fn))>0 else 1
+tpr     = round(tp / (tp + fn), 2) if fn>0 else 1
+tnr     = round(tn / (tn + fp), 2) if fp>0 else 1
+f_score = round(tp / (tp + (1/2) * (fp + fn)), 2) if (fp+fn)>0 else 1
 
 # Try to open/create CSV output file
 csv_o = None
