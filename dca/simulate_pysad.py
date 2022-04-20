@@ -38,6 +38,8 @@ import csv
 # PySAD (models and calibrator)
 from pysad.models import *
 from pysad.transform.probability_calibration import ConformalProbabilityCalibrator
+from pysad.transform.postprocessing import RunningAveragePostprocessor
+from pysad.transform.preprocessing import InstanceUnitNormScaler
 import numpy as np
 # Silence VisibleDeprecationWarning in NumPy
 import warnings
@@ -49,9 +51,9 @@ warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 RESULT_DIR  = "results/"
 
 # Threshold for calibrated anomaly score
-THRESHOLD   = 0.9      # probability of being normal is less than 10%.
+THRESHOLD   = 0.95      # probability of being normal is less than 5%.
 # Window size for anomaly score calibration
-WINDOW_SIZE = 25
+WINDOW_SIZE = 140
 
 ##### SIMULATION #######################
 # Check if result directory exists
@@ -93,22 +95,20 @@ for CSV_INPUT in csv_files:
         ## RobustRandomCutForest ##
         # https://pysad.readthedocs.io/en/latest/generated/pysad.models.RobustRandomCutForest.html#pysad.models.RobustRandomCutForest
         # Default: (num_trees=4, shingle_size=4, tree_size=256)
-        ["rrcf", RobustRandomCutForest(num_trees=5, shingle_size=10, tree_size=100)],
+        ["rrcf", RobustRandomCutForest(num_trees=10, shingle_size=5, tree_size=200)],
         
         ## xStream ##
         # https://pysad.readthedocs.io/en/latest/generated/pysad.models.xStream.html#pysad.models.xStream
         # Default: (num_components=100, n_chains=100, depth=25, window_size=25)
-        ["xstream", xStream(num_components=100, n_chains=100, depth=25, window_size=WINDOW_SIZE)],
-        
-        ##### Models running but not producing results #####
-        
-        ## LODA model ##
-        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.LODA.html#pysad.models.LODA
-        # Default: (num_bins=10, num_random_cuts=100)
-        ["loda", LODA(num_bins=5, num_random_cuts=10)],
+        ["xstream", xStream(num_components=200, n_chains=50, depth=10, window_size=WINDOW_SIZE)],
     ]
     # Init probability calibrator.
+    # Probability calibrators convert module scores into true probabilities for decision-making on anomalousness.
     calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE)
+    # Init normalizer.
+    preprocessor = InstanceUnitNormScaler()
+    # Init running average postprocessor.
+    postprocessor = RunningAveragePostprocessor(window_size=WINDOW_SIZE)
     
     # Iterate over all models of PySAD
     for (name, model) in models:
@@ -198,6 +198,7 @@ for CSV_INPUT in csv_files:
                 # Ignore DCA values
                 antigen.append("-")
                 safe.append(0.0)
+                danger.append(0.0)
                 
                 ### FAULT LABEL ###
                 label_t = int(row[15])
@@ -210,12 +211,21 @@ for CSV_INPUT in csv_files:
                 
                 # Concatenate sensor measurements
                 point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t])
+                # Fit preprocessor to and transform the instance.
+                point = preprocessor.fit_transform_partial(point)
+                
                 # Fit to an instance x and score it.
                 anomaly_score = model.fit_score_partial(point)
+                # Xstream delivers an array of scores with size 1
+                if(name == "xstream"):
+                    anomaly_score = anomaly_score[0]
+                
+                # Apply running averaging to the score.
+                #anomaly_score = postprocessor.fit_transform_partial(anomaly_score)
+                
                 # Fit & calibrate score.
                 calibrated_score = calibrator.fit_transform_partial(anomaly_score)
-                # Store the score as "danger" value
-                danger.append(calibrated_score)
+                
                 # Check if anomaly score exceeds the defined threshold
                 if calibrated_score > THRESHOLD:
                     context.append(1)
