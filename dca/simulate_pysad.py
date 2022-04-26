@@ -12,11 +12,9 @@
 #
 # @file     simulate_pysad.py
 # @author   Dominik Widhalm
-# @version  1.1.0
-# @date     2022/04/16
+# @version  1.2.0
+# @date     2022/04/26
 # @see      https://pysad.readthedocs.io/en/latest/examples.html
-#
-# @todo     Optimize model parameters for better detection results
 #####
 
 
@@ -37,7 +35,7 @@ from pathlib import Path
 import csv
 # PySAD (models and calibrator)
 from pysad.models import *
-from pysad.transform.probability_calibration import ConformalProbabilityCalibrator
+from pysad.transform.probability_calibration import *
 from pysad.transform.postprocessing import RunningAveragePostprocessor
 from pysad.transform.preprocessing import InstanceUnitNormScaler
 import numpy as np
@@ -51,9 +49,13 @@ warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 RESULT_DIR  = "results/"
 
 # Threshold for calibrated anomaly score
-THRESHOLD   = 0.95      # probability of being normal is less than 5%.
+THRESHOLD           = 0.9      # probability of being normal is less than 10%.
 # Window size for anomaly score calibration
-WINDOW_SIZE = 140
+WINDOW_SIZE_CAL     = 500       # approx. 3.5 days (@10 minute update interval)
+# Window size for post processing
+WINDOW_SIZE_POST    = 5         # average of 5 consecutive readings
+# Include node-level diagnostics in detection
+INC_DIAG            = 0         # 0 ... exclude / 1 ... include
 
 ##### SIMULATION #######################
 # Check if result directory exists
@@ -80,35 +82,11 @@ for CSV_INPUT in csv_files:
               
     # Models available in PySAD (and applicable to our data)
     models = [
-        ##### Models running and producing results #####
-        
-        ## Exact-STORM method ##
-        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.ExactStorm.html#pysad.models.ExactStorm
-        # Default: (window_size=10000, max_radius=0.1)
-        ["storm", ExactStorm(window_size=WINDOW_SIZE, max_radius=0.1)],
-        
-        ## Isolation Forest Algorithm for Streaming Data ##
-        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.IForestASD.html#pysad.models.IForestASD
-        # Default: (initial_window_X=None, window_size=2048)
-        ["iforest", IForestASD(initial_window_X=None, window_size=WINDOW_SIZE)],
-        
-        ## RobustRandomCutForest ##
-        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.RobustRandomCutForest.html#pysad.models.RobustRandomCutForest
-        # Default: (num_trees=4, shingle_size=4, tree_size=256)
-        ["rrcf", RobustRandomCutForest(num_trees=10, shingle_size=5, tree_size=200)],
-        
-        ## xStream ##
-        # https://pysad.readthedocs.io/en/latest/generated/pysad.models.xStream.html#pysad.models.xStream
-        # Default: (num_components=100, n_chains=100, depth=25, window_size=25)
-        ["xstream", xStream(num_components=200, n_chains=50, depth=10, window_size=WINDOW_SIZE)],
+        ["storm", ExactStorm()],
+        ["iforest", IForestASD()],
+        ["rrcf", RobustRandomCutForest()],
+        ["xstream", xStream()],
     ]
-    # Init probability calibrator.
-    # Probability calibrators convert module scores into true probabilities for decision-making on anomalousness.
-    calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE)
-    # Init normalizer.
-    preprocessor = InstanceUnitNormScaler()
-    # Init running average postprocessor.
-    postprocessor = RunningAveragePostprocessor(window_size=WINDOW_SIZE)
     
     # Iterate over all models of PySAD
     for (name, model) in models:
@@ -124,9 +102,33 @@ for CSV_INPUT in csv_files:
             exit(-1)
 
         # Get output CSV filename from input filename
-        extension = "-%s.csv" % (name)
+        extension = None
+        if INC_DIAG:
+            extension = "-%s_ext.csv" % (name)
+        else:
+            extension = "-%s.csv" % (name)
         CSV_OUTPUT = RESULT_DIR+(Path(CSV_INPUT).stem).replace('-ddca','') + extension
         print("    Write to file \"%s\"" % CSV_OUTPUT)
+
+        # Init probability calibrator (model dependent for best results).
+        calibrator = None
+        if (name == "storm"):
+            calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE_CAL)
+        elif (name == "xstream"):
+            calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE_CAL)
+        elif (name == "iforest"):
+            calibrator = GaussianTailProbabilityCalibrator(running_statistics=True, window_size=WINDOW_SIZE_CAL)
+        elif (name == "rrcf"):
+            calibrator = GaussianTailProbabilityCalibrator(running_statistics=True, window_size=WINDOW_SIZE_CAL)
+        else:
+            print("Unsupported model ... aborting!")
+            exit(-1)
+        
+        # Init normalizer.
+        preprocessor = InstanceUnitNormScaler()
+        
+        # Init running average postprocessor.
+        postprocessor = RunningAveragePostprocessor(window_size=WINDOW_SIZE_POST)
 
         # Prepare data arrays/lists/etc.
         snid        = []
@@ -210,7 +212,13 @@ for CSV_INPUT in csv_files:
         ####################################
                 
                 # Concatenate sensor measurements
-                point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t])
+                point = None
+                if INC_DIAG:
+                    # Sensor values + danger + safe
+                    point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t, round(float(row[17]),2), round(float(row[18]),2)])
+                else:
+                    # Sensor values
+                    point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t])
                 # Fit preprocessor to and transform the instance.
                 point = preprocessor.fit_transform_partial(point)
                 
@@ -221,7 +229,7 @@ for CSV_INPUT in csv_files:
                     anomaly_score = anomaly_score[0]
                 
                 # Apply running averaging to the score.
-                #anomaly_score = postprocessor.fit_transform_partial(anomaly_score)
+                anomaly_score = postprocessor.fit_transform_partial(anomaly_score)
                 
                 # Fit & calibrate score.
                 calibrated_score = calibrator.fit_transform_partial(anomaly_score)
