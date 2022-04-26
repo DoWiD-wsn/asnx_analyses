@@ -5,7 +5,7 @@
 # generated test datasets. The script reads all datasets fro the given
 # "RESULT_DIR", performs specified models to detect anomalies
 # (outliers), and store the data in a new dataset with a respective
-# postfix (e.g., "-stddev") in the "RESULT_DIR".
+# postfix (e.g., "-stdev") in the "RESULT_DIR".
 #
 # Call example:
 # => $ python3 simulate_outlier.py
@@ -81,7 +81,7 @@ class Welford:
     def get_variance(self):
         return (abs(self.variance) / self.cnt)
     
-    def get_stddev(self):
+    def get_stdev(self):
         var = self.get_variance()
         if var != 0:
             return math.sqrt(var)
@@ -97,7 +97,7 @@ class Welford:
         else:
             self.add(element)
         # Check for outlier (3*sigma)
-        if abs(self.get_stddev()) >= THRESHOLD:
+        if abs(self.get_stdev()) >= THRESHOLD:
             return 1
         else:
             return 0
@@ -137,7 +137,7 @@ for CSV_INPUT in csv_files:
         exit(-1)
 
     # Get output CSV filename from input filename
-    extension = "-%s.csv" % ("stddev")
+    extension = "-%s.csv" % ("stdev")
     CSV_OUTPUT = RESULT_DIR+(Path(CSV_INPUT).stem).replace('-ddca','') + extension
     print("    Write to file \"%s\"" % CSV_OUTPUT)
 

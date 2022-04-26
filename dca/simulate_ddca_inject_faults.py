@@ -53,7 +53,7 @@ OUT_DIR     = "results/"
 # dendritic cell lifetime/population
 DC_M            = 3
 # number of sensor values for std-dev evaluation
-STDDEV_N        = 10
+STDEV_N         = 10
 # sensitivity of safe indicator
 SAFE_SENS       = 0.1
 
@@ -324,16 +324,16 @@ dcs         = []
 for i in range(len(snid)):
     # Store last N sensor values
     t_air_a.append(t_air[i])
-    if len(t_air_a)>STDDEV_N:
+    if len(t_air_a)>STDEV_N:
         t_air_a.pop(0)
     t_soil_a.append(t_soil[i])
-    if len(t_soil_a)>STDDEV_N:
+    if len(t_soil_a)>STDEV_N:
         t_soil_a.pop(0)
     h_air_a.append(h_air[i])
-    if len(h_air_a)>STDDEV_N:
+    if len(h_air_a)>STDEV_N:
         h_air_a.pop(0)
     h_soil_a.append(h_soil[i])
-    if len(h_soil_a)>STDDEV_N:
+    if len(h_soil_a)>STDEV_N:
         h_soil_a.pop(0)
     ### ANTIGEN ###
     # use SNID as antigen
