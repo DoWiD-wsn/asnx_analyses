@@ -12,9 +12,8 @@
 #
 # @file     simulate_outlier.py
 # @author   Dominik Widhalm
-# @version  1.0.0
-# @date     2022/04/25
-# @see      https://towardsdatascience.com/easy-outlier-detection-in-data-streams-3089bfefe528
+# @version  1.1.0
+# @date     2022/04/27
 #####
 
 
@@ -42,6 +41,8 @@ RESULT_DIR  = "results/"
 WINDOW_SIZE = 15
 # Detection threshold (multiples of sigma)
 THRESHOLD   = 3
+# Include node-level diagnostics (danger indicator) in detection
+INC_DIAG    = 0         # 0 ... exclude / 1 ... include
 
 ##### CLASS FOR WELFORD'S ALGORITHM ####
 class Welford:
@@ -137,7 +138,11 @@ for CSV_INPUT in csv_files:
         exit(-1)
 
     # Get output CSV filename from input filename
-    extension = "-%s.csv" % ("stdev")
+    extension = None
+    if INC_DIAG:
+        extension = "-stdev_ext.csv"
+    else:
+        extension = "-stdev.csv"
     CSV_OUTPUT = RESULT_DIR+(Path(CSV_INPUT).stem).replace('-ddca','') + extension
     print("    Write to file \"%s\"" % CSV_OUTPUT)
 
@@ -172,6 +177,8 @@ for CSV_INPUT in csv_files:
     t_soil_inst = Welford(window=WINDOW_SIZE)
     h_air_inst  = Welford(window=WINDOW_SIZE)
     h_soil_inst = Welford(window=WINDOW_SIZE)
+    if INC_DIAG:
+        d_inst  = Welford(window=WINDOW_SIZE)
     
     #######################################
     ##### Step 1 - sensor node update #####
@@ -216,7 +223,11 @@ for CSV_INPUT in csv_files:
             # Ignore DCA values
             antigen.append("-")
             safe.append(0.0)
-            danger.append(0.0)
+            danger_t = round(float(row[17]),2)
+            if INC_DIAG:
+                danger.append(danger_t)
+            else:
+                danger.append(0.0)
             
             ### FAULT LABEL ###
             label_t = int(row[15])
@@ -232,8 +243,16 @@ for CSV_INPUT in csv_files:
             t_soil_cx = t_soil_inst.update(t_soil_t)
             h_air_cx = h_air_inst.update(h_air_t)
             h_soil_cx = h_soil_inst.update(h_soil_t)
+            
+            if INC_DIAG:
+                # Correct indicator sensibility factor (0.1 -> x10)
+                d_cx = d_inst.update(danger_t*10.0)
+            
             # Outlier if at least one data element is an outlier
-            context.append(max(t_air_cx,t_soil_cx,h_air_cx,h_soil_cx))
+            if INC_DIAG:
+                context.append(max(t_air_cx,t_soil_cx,h_air_cx,h_soil_cx,d_cx))
+            else:
+                context.append(max(t_air_cx,t_soil_cx,h_air_cx,h_soil_cx))
 
         # Increment line counter
         line_count += 1
