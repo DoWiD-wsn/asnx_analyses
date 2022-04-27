@@ -12,7 +12,7 @@
 #
 # @file     simulate_pysad.py
 # @author   Dominik Widhalm
-# @version  1.2.0
+# @version  1.2.1
 # @date     2022/04/26
 # @see      https://pysad.readthedocs.io/en/latest/examples.html
 #####
@@ -55,7 +55,7 @@ WINDOW_SIZE_CAL     = 500       # approx. 3.5 days (@10 minute update interval)
 # Window size for post processing
 WINDOW_SIZE_POST    = 5         # average of 5 consecutive readings
 # Include node-level diagnostics in detection
-INC_DIAG            = 0         # 0 ... exclude / 1 ... include
+INC_DIAG            = 1         # 0 ... exclude / 1 ... include
 
 ##### SIMULATION #######################
 # Check if result directory exists
@@ -214,8 +214,8 @@ for CSV_INPUT in csv_files:
                 # Concatenate sensor measurements
                 point = None
                 if INC_DIAG:
-                    # Sensor values + danger + safe
-                    point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t, round(float(row[17]),2), round(float(row[18]),2)])
+                    # Sensor values + danger indicator (incl. sensibility: 0.1 -> x10)
+                    point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t, round(float(row[17])*10,2)])
                 else:
                     # Sensor values
                     point = np.array([t_air_t, t_soil_t, h_air_t, h_soil_t])
