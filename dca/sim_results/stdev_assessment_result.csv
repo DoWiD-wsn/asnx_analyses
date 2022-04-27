@@ -1,18 +1,23 @@
 dataset,value,measurements,true positives (TP),true negatives (TN),false positives (FP),false negatives (FN),sensitivity (TPR),specificity (TNR),accuracy (F-score)
-total (40 datasets),mean,999.5,37.15,664.5,288.85,9.0,0.82,0.7,0.25
-total (40 datasets),min,997,3,422,39,0,0.35,0.46,0.01
-total (40 datasets),max,1002,81,946,509,51,1,0.96,0.49
+total (60 datasets),mean,4025.67,34.8,3757.57,223.58,9.72,0.79,0.8,0.29
+total (60 datasets),min,997,2,422,11,0,0.2,0.46,0.01
+total (60 datasets),max,10078,81,10057,509,51,1,1.0,0.5
+results/base_-_indoor_-_room_airing-faulty-9-stdev.csv,-,10078,37,9876,157,8,0.82,0.98,0.31
 results/base_-_indoor_-_stable-faulty-3-stdev.csv,-,997,67,755,164,11,0.86,0.82,0.43
+results/base_-_indoor_-_room_airing-faulty-16-stdev.csv,-,10078,36,9938,96,8,0.82,0.99,0.41
 results/base_-_outdoor_-_heavy_rain-faulty-8-stdev.csv,-,1002,54,455,488,5,0.92,0.48,0.18
 results/base_-_outdoor_-_heavy_rain-faulty-0-stdev.csv,-,1002,14,540,442,6,0.7,0.55,0.06
 results/base_-_indoor_-_stable-faulty-17-stdev.csv,-,997,9,929,52,7,0.56,0.95,0.23
+results/base_-_indoor_-_room_airing-faulty-13-stdev.csv,-,10078,42,9862,150,24,0.64,0.99,0.33
 results/base_-_outdoor_-_heavy_rain-faulty-3-stdev.csv,-,1002,21,493,488,0,1,0.5,0.08
 results/base_-_outdoor_-_heavy_rain-faulty-6-stdev.csv,-,1002,63,446,485,8,0.89,0.48,0.2
 results/base_-_indoor_-_stable-faulty-11-stdev.csv,-,997,29,861,91,16,0.64,0.9,0.35
 results/base_-_indoor_-_stable-faulty-16-stdev.csv,-,997,53,760,168,16,0.77,0.82,0.37
 results/base_-_outdoor_-_heavy_rain-faulty-9-stdev.csv,-,1002,68,438,483,13,0.84,0.48,0.22
 results/base_-_indoor_-_stable-faulty-7-stdev.csv,-,997,26,891,73,7,0.79,0.92,0.39
+results/base_-_indoor_-_room_airing-faulty-10-stdev.csv,-,10078,5,10033,32,8,0.38,1.0,0.2
 results/base_-_outdoor_-_heavy_rain-faulty-16-stdev.csv,-,1002,20,504,478,0,1,0.51,0.08
+results/base_-_indoor_-_room_airing-faulty-12-stdev.csv,-,10078,34,9959,85,0,1,0.99,0.44
 results/base_-_indoor_-_stable-faulty-4-stdev.csv,-,997,69,773,147,8,0.9,0.84,0.47
 results/base_-_outdoor_-_heavy_rain-faulty-13-stdev.csv,-,1002,8,524,465,5,0.62,0.53,0.03
 results/base_-_indoor_-_stable-faulty-13-stdev.csv,-,997,48,803,116,30,0.62,0.87,0.4
@@ -25,19 +30,34 @@ results/base_-_outdoor_-_heavy_rain-faulty-2-stdev.csv,-,1002,46,453,483,20,0.7,
 results/base_-_indoor_-_stable-faulty-2-stdev.csv,-,997,24,892,65,16,0.6,0.93,0.37
 results/base_-_outdoor_-_heavy_rain-faulty-14-stdev.csv,-,1002,37,499,451,15,0.71,0.53,0.14
 results/base_-_indoor_-_stable-faulty-10-stdev.csv,-,997,31,902,64,0,1,0.93,0.49
+results/base_-_indoor_-_room_airing-faulty-17-stdev.csv,-,10078,22,9996,52,8,0.73,0.99,0.42
+results/base_-_indoor_-_room_airing-faulty-3-stdev.csv,-,10078,9,10051,18,0,1,1.0,0.5
 results/base_-_indoor_-_stable-faulty-19-stdev.csv,-,997,42,840,110,5,0.89,0.88,0.42
+results/base_-_indoor_-_room_airing-faulty-19-stdev.csv,-,10078,16,9999,55,8,0.67,0.99,0.34
+results/base_-_indoor_-_room_airing-faulty-15-stdev.csv,-,10078,46,9921,103,8,0.85,0.99,0.45
 results/base_-_outdoor_-_heavy_rain-faulty-12-stdev.csv,-,1002,48,445,509,0,1,0.47,0.16
 results/base_-_indoor_-_stable-faulty-1-stdev.csv,-,997,65,797,135,0,1,0.86,0.49
+results/base_-_indoor_-_room_airing-faulty-1-stdev.csv,-,10078,44,9859,160,15,0.75,0.98,0.33
 results/base_-_outdoor_-_heavy_rain-faulty-18-stdev.csv,-,1002,29,510,463,0,1,0.52,0.11
+results/base_-_indoor_-_room_airing-faulty-8-stdev.csv,-,10078,44,9914,104,16,0.73,0.99,0.42
+results/base_-_indoor_-_room_airing-faulty-14-stdev.csv,-,10078,18,10024,36,0,1,1.0,0.5
 results/base_-_indoor_-_stable-faulty-12-stdev.csv,-,997,29,846,98,24,0.55,0.9,0.32
 results/base_-_outdoor_-_heavy_rain-faulty-7-stdev.csv,-,1002,10,519,460,13,0.43,0.53,0.04
 results/base_-_indoor_-_stable-faulty-14-stdev.csv,-,997,28,786,132,51,0.35,0.86,0.23
 results/base_-_outdoor_-_heavy_rain-faulty-15-stdev.csv,-,1002,47,484,467,4,0.92,0.51,0.17
+results/base_-_indoor_-_room_airing-faulty-18-stdev.csv,-,10078,49,9869,136,24,0.67,0.99,0.38
+results/base_-_indoor_-_room_airing-faulty-11-stdev.csv,-,10078,9,10051,18,0,1,1.0,0.5
+results/base_-_indoor_-_room_airing-faulty-4-stdev.csv,-,10078,49,9870,151,8,0.86,0.98,0.38
 results/base_-_outdoor_-_heavy_rain-faulty-11-stdev.csv,-,1002,16,529,452,5,0.76,0.54,0.07
 results/base_-_indoor_-_stable-faulty-9-stdev.csv,-,997,36,853,92,16,0.69,0.9,0.4
 results/base_-_outdoor_-_heavy_rain-faulty-4-stdev.csv,-,1002,23,532,447,0,1,0.54,0.09
+results/base_-_indoor_-_room_airing-faulty-2-stdev.csv,-,10078,3,10054,21,0,1,1.0,0.22
 results/base_-_outdoor_-_heavy_rain-faulty-10-stdev.csv,-,1002,34,479,489,0,1,0.49,0.12
 results/base_-_indoor_-_stable-faulty-0-stdev.csv,-,997,46,827,124,0,1,0.87,0.43
+results/base_-_indoor_-_room_airing-faulty-6-stdev.csv,-,10078,56,9812,194,16,0.78,0.98,0.35
+results/base_-_indoor_-_room_airing-faulty-7-stdev.csv,-,10078,45,9851,150,32,0.58,0.99,0.33
+results/base_-_indoor_-_room_airing-faulty-5-stdev.csv,-,10078,2,10057,11,8,0.2,1.0,0.17
+results/base_-_indoor_-_room_airing-faulty-0-stdev.csv,-,10078,36,9878,132,32,0.53,0.99,0.31
 results/base_-_indoor_-_stable-faulty-8-stdev.csv,-,997,42,813,120,22,0.66,0.87,0.37
 results/base_-_outdoor_-_heavy_rain-faulty-17-stdev.csv,-,1002,81,434,476,11,0.88,0.48,0.25
 results/base_-_outdoor_-_heavy_rain-faulty-1-stdev.csv,-,1002,74,422,500,6,0.93,0.46,0.23
