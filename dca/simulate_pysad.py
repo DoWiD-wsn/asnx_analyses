@@ -85,7 +85,6 @@ for CSV_INPUT in csv_files:
         ["storm", ExactStorm()],
         ["iforest", IForestASD()],
         ["rrcf", RobustRandomCutForest()],
-        ["xstream", xStream()],
     ]
     
     # Iterate over all models of PySAD
@@ -113,8 +112,6 @@ for CSV_INPUT in csv_files:
         # Init probability calibrator (model dependent for best results).
         calibrator = None
         if (name == "storm"):
-            calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE_CAL)
-        elif (name == "xstream"):
             calibrator = ConformalProbabilityCalibrator(windowed=True, window_size=WINDOW_SIZE_CAL)
         elif (name == "iforest"):
             calibrator = GaussianTailProbabilityCalibrator(running_statistics=True, window_size=WINDOW_SIZE_CAL)
@@ -224,9 +221,6 @@ for CSV_INPUT in csv_files:
                 
                 # Fit to an instance x and score it.
                 anomaly_score = model.fit_score_partial(point)
-                # Xstream delivers an array of scores with size 1
-                if(name == "xstream"):
-                    anomaly_score = anomaly_score[0]
                 
                 # Apply running averaging to the score.
                 anomaly_score = postprocessor.fit_transform_partial(anomaly_score)
