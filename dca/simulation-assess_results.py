@@ -103,6 +103,7 @@ fn_tot      = []
 # Results
 tpr_tot     = []
 tnr_tot     = []
+acc_tot     = []
 f_score_tot = []
 
 # Read in all result files
@@ -169,6 +170,7 @@ for filename in csv_files:
     ### CALCULATE METRICS ###
     tpr     = round(tp / (tp + fn), 2) if fn>0 else 1
     tnr     = round(tn / (tn + fp), 2) if fp>0 else 1
+    acc     = round((tp + tn) / (tp + tn + fp + fn),2)
     f_score = round(tp / (tp + (1/2) * (fp + fn)), 2) if (fp+fn)>0 else 1
     
     ### Append results to result lists
@@ -180,6 +182,7 @@ for filename in csv_files:
     # Results
     tpr_tot.append(tpr)
     tnr_tot.append(tnr)
+    acc_tot.append(acc)
     f_score_tot.append(f_score)
 
 # Calculated mean, min, and max values
@@ -190,6 +193,7 @@ fp_mean      = 0
 fn_mean      = 0
 tpr_mean     = 0
 tnr_mean     = 0
+acc_mean     = 0
 f_score_mean = 0
 lines_min    = 999
 tp_min       = 999
@@ -198,6 +202,7 @@ fp_min       = 999
 fn_min       = 999
 tpr_min      = 999
 tnr_min      = 999
+acc_min      = 999
 f_score_min  = 999
 lines_max    = 0
 tp_max       = 0
@@ -206,6 +211,7 @@ fp_max       = 0
 fn_max       = 0
 tpr_max      = 0
 tnr_max      = 0
+acc_max      = 0
 f_score_max  = 0
 for i in range(len(lines_tot)):
     ### mean sum ###
@@ -216,6 +222,7 @@ for i in range(len(lines_tot)):
     fn_mean      += fn_tot[i]
     tpr_mean     += tpr_tot[i]
     tnr_mean     += tnr_tot[i]
+    acc_mean     += acc_tot[i]
     f_score_mean += f_score_tot[i]
     ### min values ###
     if (lines_tot[i]<lines_min):
@@ -232,6 +239,8 @@ for i in range(len(lines_tot)):
         tpr_min = tpr_tot[i]
     if (tnr_tot[i]<tnr_min):
         tnr_min = tnr_tot[i]
+    if (acc_tot[i]<acc_min):
+        acc_min = acc_tot[i]
     if (f_score_tot[i]<f_score_min):
         f_score_min = f_score_tot[i]
     ### max values ###
@@ -249,6 +258,8 @@ for i in range(len(lines_tot)):
         tpr_max = tpr_tot[i]
     if (tnr_tot[i]>tnr_max):
         tnr_max = tnr_tot[i]
+    if (acc_tot[i]>acc_max):
+        acc_max = acc_tot[i]
     if (f_score_tot[i]>f_score_max):
         f_score_max = f_score_tot[i]
 ### mean final ###
@@ -259,6 +270,7 @@ fp_mean      = round(fp_mean/len(lines_tot), 2)
 fn_mean      = round(fn_mean/len(lines_tot), 2)
 tpr_mean     = round(tpr_mean/len(lines_tot), 2)
 tnr_mean     = round(tnr_mean/len(lines_tot), 2)
+acc_mean     = round(acc_mean/len(lines_tot), 2)
 f_score_mean = round(f_score_mean/len(lines_tot), 2)
 
 
@@ -276,7 +288,7 @@ except Exception as e:
 
 # Write initial rows into the CSV file
 try:
-    csv_o.writerow(["dataset", "value", "measurements", "true positives (TP)", "true negatives (TN)", "false positives (FP)", "false negatives (FN)", "sensitivity (TPR)", "specificity (TNR)", "accuracy (F-score)"])
+    csv_o.writerow(["dataset", "value", "measurements", "true positives (TP)", "true negatives (TN)", "false positives (FP)", "false negatives (FN)", "sensitivity (TPR)", "specificity (TNR)", "accuracy (ACC)", "accuracy (F-score)"])
 except Exception as e:
     print("Writing initial data to the CSV file failed ... aborting!")
     print(e)
@@ -285,9 +297,9 @@ except Exception as e:
 # Write total results into the CSV file
 try:
     tot_string = "total (%d datasets)" % (num_files)
-    csv_o.writerow([tot_string, "mean", lines_mean, tp_mean, tn_mean, fp_mean, fn_mean, tpr_mean, tnr_mean, f_score_mean])
-    csv_o.writerow([tot_string, "min", lines_min, tp_min, tn_min, fp_min, fn_min, tpr_min, tnr_min, f_score_min])
-    csv_o.writerow([tot_string, "max", lines_max, tp_max, tn_max, fp_max, fn_max, tpr_max, tnr_max, f_score_max])
+    csv_o.writerow([tot_string, "mean", lines_mean, tp_mean, tn_mean, fp_mean, fn_mean, tpr_mean, tnr_mean, acc_mean, f_score_mean])
+    csv_o.writerow([tot_string, "min", lines_min, tp_min, tn_min, fp_min, fn_min, tpr_min, tnr_min, acc_min, f_score_min])
+    csv_o.writerow([tot_string, "max", lines_max, tp_max, tn_max, fp_max, fn_max, tpr_max, tnr_max, acc_max, f_score_max])
 except Exception as e:
     print("Writing total data to the CSV file failed ... aborting!")
     print(e)
@@ -296,7 +308,7 @@ except Exception as e:
 # Write particular results into the CSV file
 for i in range(len(lines_tot)):
     try:
-        csv_o.writerow([csv_files[i], "-", lines_tot[i], tp_tot[i], tn_tot[i], fp_tot[i], fn_tot[i], tpr_tot[i], tnr_tot[i], f_score_tot[i]])
+        csv_o.writerow([csv_files[i], "-", lines_tot[i], tp_tot[i], tn_tot[i], fp_tot[i], fn_tot[i], tpr_tot[i], tnr_tot[i], acc_tot[i], f_score_tot[i]])
     except Exception as e:
         print("Writing dataset %d data to the CSV file failed ... aborting!" % (i))
         print(e)
